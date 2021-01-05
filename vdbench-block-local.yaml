@@ -1,0 +1,182 @@
+# Local Disk storage class
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vdbench-bs-pwx-0
+spec:
+  capacity:
+    storage: 50Gi
+  volumeMode: Block
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: local-storage
+  local:
+    path: /dev/pxd/pxd1054773657008748565 # Change to correct device path
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - nodename #change to hostname of K8S Host you are using
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vdbench-bs-pwx-1
+spec:
+  capacity:
+    storage: 50Gi
+  volumeMode: Block
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: local-storage
+  local:
+    path: /dev/pxd/pxd234970879122504832 # Change to correct device path
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - nodename #change to hostname of K8S Host you are using
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vdbench-bs-pwx-2
+spec:
+  capacity:
+    storage: 50Gi
+  volumeMode: Block
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: local-storage
+  local:
+    path: /dev/pxd/pxd926217724212074340 # Change to correct device path
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - nodename #change to hostname of K8S Host you are using
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vdbench-bs-0
+spec:
+  storageClassName: local-storage
+  accessModes:
+  - ReadWriteOnce
+  volumeMode: Block
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vdbench-bs-1
+spec:
+  storageClassName: local-storage
+  accessModes:
+  - ReadWriteOnce
+  volumeMode: Block
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vdbench-bs-2
+spec:
+  storageClassName: local-storage
+  accessModes:
+  - ReadWriteOnce
+  volumeMode: Block
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vdbench-job-config
+data:
+    vdbench.job: |
+      sd=sd1,lun=/dev/rbd0,openflags=o_direct,size=40g
+      sd=sd2,lun=/dev/rbd1,openflags=o_direct,size=40g
+      sd=sd3,lun=/dev/rbd2,openflags=o_direct,size=40g
+      wd=wd1,sd=sd*,seekpct=eof,rdpct=0
+      wd=wd2,sd=sd*,seekpct=0
+      wd=wd3,sd=sd*,seekpct=100
+      wd=wd4,sd=sd*,seekpct=50
+      wd=wd5,sd=sd*,xfersize=8k
+      wd=wd6,sd=sd*,xfersize=16k
+      wd=wd7,sd=sd*,xfersize=64k
+      wd=wd8,sd=sd*,xfersize=64k
+      wd=wd9,sd=sd*,seekpct=50
+      rd=default,elapsed=300,interval=1
+      rd=prefill1,wd=wd1,iorate=max,interval=1,elapsed=600,xfersize=1m,threads=16
+      rd=test1,wd=wd2,iorate=max,interval=10,elapsed=600,forrdpct=(0,100,70,30),forxfersize=(4k,8K,16K,32k,64K,128K,512K,1m),threads=1,pause=10
+      rd=test2,wd=wd3,iorate=max,interval=10,elapsed=600,forrdpct=(0,100,70,30),forxfersize=(4k,8K,16K,32k,64K,128K,512K,1m),threads=32,pause=10
+      rd=test3,wd=wd4,iorate=max,interval=10,elapsed=600,forrdpct=(0,100,70,30),forxfersize=(4k,8K,16K,32k,64K,128K,512K,1m),threads=32,pause=10
+      rd=test4,wd=(wd5,wd6,wd7,wd8),iorate=(10000-300000,10000),interval=10,elapsed=300,seekpct=50,rdpct=0,threads=16
+      rd=test5,wd=(wd5,wd6,wd7,wd8),iorate=(10000-300000,10000),interval=10,elapsed=300,seekpct=50,rdpct=100,threads=16
+      rd=test6,wd=(wd5,wd6,wd7,wd8),iorate=(10000-300000,10000),interval=10,elapsed=300,seekpct=50,rdpct=30,threads=16
+      rd=test7,wd=wd9,iorate=100000,interval=1,elapsed=84780,rdpct=50,xfersize=16k,threads=16
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vdbench-rawblock
+spec:
+  restartPolicy: Always
+  terminationGracePeriodSeconds: 30
+  containers:
+    - name: vdbench
+      image: portworx/torpedo:vdbench
+      command: ["/vdbench-runner.sh"]
+      volumeMounts:
+      - name: vdbench-config-vol
+        mountPath: /templates
+      - name: vdbench-data
+        mountPath: /datadir
+      - name: vdbench-log
+        mountPath: /logdir
+      volumeDevices:
+      - name: local-disks-0
+        devicePath: /dev/rdb0
+      - name: local-disks-1
+        devicePath: /dev/rbd1
+      - name: local-disks-2
+        devicePath: /dev/rbd2
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      imagePullPolicy: IfNotPresent
+  nodeName: nodename #change to name of K8S Host you are using
+  volumes:
+    - name: local-disks-0
+      persistentVolumeClaim:
+        claimName: vdbench-bs-0
+    - name: local-disks-1
+      persistentVolumeClaim:
+        claimName: vdbench-bs-1
+    - name: local-disks-2
+      persistentVolumeClaim:
+        claimName: vdbench-bs-2
