@@ -155,10 +155,6 @@ spec:
       volumeMounts:
       - name: vdbench-config-vol
         mountPath: /templates
-      - name: vdbench-data
-        mountPath: /datadir
-      - name: vdbench-log
-        mountPath: /logdir
       volumeDevices:
       - name: local-disks-0
         devicePath: /dev/rdb0
@@ -180,3 +176,6 @@ spec:
     - name: local-disks-2
       persistentVolumeClaim:
         claimName: vdbench-bs-2
+    - name: vdbench-config-vol
+      configMap:
+        name: vdbench-job-config
