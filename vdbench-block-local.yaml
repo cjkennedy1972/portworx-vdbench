@@ -119,9 +119,9 @@ metadata:
   name: vdbench-job-config
 data:
     vdbench.job: |
-      sd=sd1,lun=/dev/rbd0,openflags=o_direct,size=40g
-      sd=sd2,lun=/dev/rbd1,openflags=o_direct,size=40g
-      sd=sd3,lun=/dev/rbd2,openflags=o_direct,size=40g
+      sd=sd1,lun=/dev/rdb0,openflags=o_direct,size=40g
+      sd=sd2,lun=/dev/rdb1,openflags=o_direct,size=40g
+      sd=sd3,lun=/dev/rdb2,openflags=o_direct,size=40g
       wd=wd1,sd=sd*,seekpct=eof,rdpct=0
       wd=wd2,sd=sd*,seekpct=0
       wd=wd3,sd=sd*,seekpct=100
@@ -159,9 +159,9 @@ spec:
       - name: local-disks-0
         devicePath: /dev/rdb0
       - name: local-disks-1
-        devicePath: /dev/rbd1
+        devicePath: /dev/rdb1
       - name: local-disks-2
-        devicePath: /dev/rbd2
+        devicePath: /dev/rdb2
       terminationMessagePath: /dev/termination-log
       terminationMessagePolicy: File
       imagePullPolicy: IfNotPresent
