@@ -26,7 +26,7 @@ spec:
             - key: kubernetes.io/hostname
               operator: In
               values:
-                - nodename #change to hostname of K8S Host you are using
+                - NodeName #change to hostname of K8S Host you are using
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -49,7 +49,7 @@ spec:
             - key: kubernetes.io/hostname
               operator: In
               values:
-                - nodename #change to hostname of K8S Host you are using
+                - NodeName #change to hostname of K8S Host you are using
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -72,7 +72,7 @@ spec:
             - key: kubernetes.io/hostname
               operator: In
               values:
-                - nodename #change to hostname of K8S Host you are using
+                - NodeName #change to hostname of K8S Host you are using
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -151,13 +151,14 @@ spec:
   containers:
     - name: vdbench
       image: portworx/torpedo:vdbench
-      command: ["/vdbench-runner.sh"]
+      command: ["/bin/bash"]
+      args: ["-c", "tail -f /dev/null"]
       volumeMounts:
       - name: vdbench-config-vol
         mountPath: /templates
       volumeDevices:
       - name: local-disks-0
-        devicePath: /dev/rdb0
+        devicePath: /dev/rbd0
       - name: local-disks-1
         devicePath: /dev/rbd1
       - name: local-disks-2
@@ -165,7 +166,7 @@ spec:
       terminationMessagePath: /dev/termination-log
       terminationMessagePolicy: File
       imagePullPolicy: IfNotPresent
-  nodeName: nodename #change to name of K8S Host you are using
+  nodeName: NodeName #change to name of K8S Host you are using
   volumes:
     - name: local-disks-0
       persistentVolumeClaim:
