@@ -27,6 +27,11 @@ spec:
               operator: In
               values:
                 - NodeName #change to hostname of K8S Host you are using
+  claimRef:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    name: vdbench-bs-0
+    namespace: default
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -50,6 +55,11 @@ spec:
               operator: In
               values:
                 - NodeName #change to hostname of K8S Host you are using
+  claimRef:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    name: vdbench-bs-1
+    namespace: default
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -73,6 +83,11 @@ spec:
               operator: In
               values:
                 - NodeName #change to hostname of K8S Host you are using
+  claimRef:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    name: vdbench-bs-2
+    namespace: default
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
