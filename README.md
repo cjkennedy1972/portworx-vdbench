@@ -8,7 +8,7 @@ By default Kubernetes CSI provisioned volumes are consumed with a file-system in
 
 Here you will find a set of YAML files to provision 3 Portworx Volumes, a manual step to mount them to a host, and a YAML file to bring them up in a Kubernetes managed pod running VDBench. I have also included sample tests in a ConfigMap. This can be edited to change the testing parameters.
 
-# Preparing your environment:
+## Preparing your environment:
 First you will want to download and run vdbench-raw-pvc.yaml. This will create 3 PVCs to use for the benchmarking.
 You can verifiy their creation by issuing:
 
@@ -37,19 +37,19 @@ ID			NAME						SIZE	HA	SHARED	ENCRYPTED	PROXY-VOLUME	IO_PRIORITYSTATUS				SNAP-E
 
 985137598051312616	pvc-6ab79f32-def9-44af-b35b-474a38b006a8	5 GiB	1	no	no		no		HIGH		up - attached on 10.10.100.102	no
 
-107592820124132570	pvc-d5e878f6-ce7b-44e2-a1cb-6342859d75c3	10 GiB	1	no	no		no		HIGH		up - attached on 10.10.100.102	no
+107592820124132570  pvc-d5e878f6-ce7b-44e2-a1cb-6342859d75c3	10 GiB	1	no	no		no		HIGH		up - attached on 10.10.100.102	no
 
 To mount the unattached volumes to the host you need to copy the ID of the three volumes and issue:
 
 > pxctl host attach 1054773657008748565 && pxctl host attach 234970879122504832 && pxctl host attach 926217724212074340
 
-This will mount the 3 volumes as /dev/pxd/pxd1054773657008748565, etc. 
+This will mount the 3 volumes as /dev/pxd/pxd1054773657008748565, etc.
 You can issue >ls /dev/pxd to verify the are mounted.
 *With the name of the 3 volumes copied to a text editor or some other means, you then log out of the host and proceed.*
 
-# Running the Benchmarks
+## Running the Benchmarks
 
-Next download vdbench-block-local.yaml and edit the device paths in that file to match those on your host. Also replace any instances of nodename with the hostname of the node you mounted the volumes on. 
+Next download vdbench-block-local.yaml and edit the device paths in that file to match those on your host. Also replace any instances of nodename with the hostname of the node you mounted the volumes on.
 
 Once you have finished your substitutions, you can issue kubectl create -f vdbench-block-local.yaml to start the pod. Once the pod is created, Exec into it. VDBENCH is located at /vdb/vdbench and the job configuration will be in /templates/vdbench.job. So, to run the benchmark you can run:
 
